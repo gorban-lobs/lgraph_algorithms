@@ -1,4 +1,4 @@
-from 
+from algorithms import stack_processing
 
 
 def test_stack_processing():
@@ -26,3 +26,7 @@ def test_stack_processing():
     cur_trace = {'round': ('(', 2), 'square': ('[', 3)}
     assert stack_processing(trace_stack, cur_trace) == True
     print('5:', trace_stack)
+
+
+if __name__ == '__main__':
+    test_stack_processing()

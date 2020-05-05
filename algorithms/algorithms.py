@@ -22,19 +22,54 @@ def stack_processing(trace_stack, cur_trace):
     return True
 
 
-def rest_direct(vert, direct_dict, trace):
-    res_chains = []
-    for edge in vert.edges:
-        pass
+def rest_direct(vertex, trace_stack, passed_edges, determ_vertexes, finals):
+    fst_label_set = set()
+    determ_vertexes[vertex.name] = {'is_determ': True, 'fst_labels_set': None}
+    for edge in vertex.edges:
+        new_passed_edges = passed_edges.copy()
+        if (edge.beg.name, edge.end.name) in passed_edges:
+            return
+        else:
+            new_passed_edges.add((edge.beg.name, edge.end.name))
+ 
+        if edge.end in finals:
+            # TODO make smth with finals
+            fst_label_set.add('eps')
+            continue
+        direct_set = set()
+        new_stack = trace_stack.copy()
+        if stack_processing(new_stack, 
+                            {'round': edge.round_trace, 
+                             'square': edge.round_trace}):
+            if edge.label:
+                if rest_direct(edge.end,
+                               new_stack,
+                               new_passed_edges,
+                               determ_vertexes,
+                               finals):
+                    direct_set.add(edge.label)
+            else:
+                for label in rest_direct(edge.end, 
+                                         new_stack,
+                                         new_passed_edges,
+                                         determ_vertexes,
+                                         finals):
+                    if label in direct_set:
+                        determ_vertexes[vertex.name]['is_determ'] = False
+                    direct_set.add(label)
+        fst_label_size = len(fst_label_set)
+        fst_label_set = fst_label_set.union(direct_set)
+        if len(fst_label_set) != fst_label_size + len(direct_set):
+            determ_vertexes[vertex.name]['is_determ'] = False
+        determ_vertexes[vertex.name]['fst_labels_set'] = fst_label_set
+    return fst_label_set
 
 
 def create_direct_dict(lgraph):
-    direct_dict = dict()
+    # TODO many initial vertexes
+    determ_vertexes = dict()
     for init_vert in lgraph.initials:
-        vert = init_vert.edges[0].end
-        trace = {'round': [], 'square': []}
-        full_chain = rest_direct(vert, direct_dict, trace)
-
-
-if __name__ == '__main__':
-    test_stack_processing()
+        vertex = list(init_vert.edges)[0].end
+        trace_stack = {'round': [], 'square': []}
+        rest_direct(vertex, trace_stack, set(), determ_vertexes, lgraph.finals)
+    return determ_vertexes
