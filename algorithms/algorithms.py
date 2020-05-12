@@ -9,7 +9,6 @@ def stack_processing(trace_stack, cur_trace):
     )
     for trace in traces:
         trace_type = trace['trace_type']
-        # if cur_trace[trace_type][0]:
         if cur_trace[trace_type][0] == trace['open']:
             trace_stack[trace_type].append(cur_trace[trace_type])
         elif cur_trace[trace_type][0] == trace['closed']:
@@ -25,7 +24,6 @@ def stack_processing(trace_stack, cur_trace):
 def rest_direct(vertex, trace_stack, passed_edges, determ_vertexes, finals,
                 cycle_iterations):
     fst_label_set = set()
-    # print(determ_vertexes)
     if vertex.name not in determ_vertexes:
         determ_vertexes[vertex.name] = {'is_determ': True, 
                                         'fst_labels_set': set()}
@@ -35,19 +33,14 @@ def rest_direct(vertex, trace_stack, passed_edges, determ_vertexes, finals,
         # print(f'{cur_edge} | {new_passed_edges} | {trace_stack}')
         if cur_edge in new_passed_edges and \
                 new_passed_edges[cur_edge] == cycle_iterations:
-            # new_passed_edges[cur_edge] += 1
-            # print('continue')
             continue
         else:
             if cur_edge not in new_passed_edges:
-                # print('new')
                 new_passed_edges[cur_edge] = 1
             else:
-                # print('add')
                 new_passed_edges[cur_edge] += 1
 
         if edge.end in finals:
-            # make smth with finals
             fst_label_set.add('eps')
             continue
         direct_set = set()
@@ -95,3 +88,10 @@ def create_direct_dict(lgraph, cycle_iterations=1):
         rest_direct(vertex, trace_stack, passed_edges, 
                     determ_vertexes, lgraph.finals, cycle_iterations)
     return determ_vertexes
+
+
+def is_determinated(direct_dict):
+    for vert in direct_dict.values():
+        if not vert['is_determ']:
+            return False
+    return True
