@@ -21,11 +21,11 @@ def stack_processing(trace_stack, cur_trace):
     return True
 
 
-def rest_direct(vertex, trace_stack, passed_edges, determ_vertexes, finals,
+def rest_direct(vertex, trace_stack, passed_edges, determ_vertices, finals,
                 cycle_iterations):
     fst_label_set = set()
-    if vertex.name not in determ_vertexes:
-        determ_vertexes[vertex.name] = {'is_determ': True, 
+    if vertex.name not in determ_vertices:
+        determ_vertices[vertex.name] = {'is_determ': True, 
                                         'fst_labels_set': set()}
     for edge in vertex.edges:
         new_passed_edges = passed_edges.copy()
@@ -52,7 +52,7 @@ def rest_direct(vertex, trace_stack, passed_edges, determ_vertexes, finals,
                 if rest_direct(edge.end,
                                new_stack,
                                new_passed_edges,
-                               determ_vertexes,
+                               determ_vertices,
                                finals,
                                cycle_iterations):
                     direct_set.add(edge.label)
@@ -60,18 +60,21 @@ def rest_direct(vertex, trace_stack, passed_edges, determ_vertexes, finals,
                 for label in rest_direct(edge.end, 
                                          new_stack,
                                          new_passed_edges,
-                                         determ_vertexes,
+                                         determ_vertices,
                                          finals,
                                          cycle_iterations):
                     if label in direct_set:
-                        determ_vertexes[vertex.name]['is_determ'] = False
+                        determ_vertices[vertex.name]['is_determ'] = False
                     direct_set.add(label)
         fst_label_size = len(fst_label_set)
         fst_label_set = fst_label_set.union(direct_set)
         if len(fst_label_set) != fst_label_size + len(direct_set):
-            determ_vertexes[vertex.name]['is_determ'] = False
-    determ_vertexes[vertex.name]['fst_labels_set'] = \
-        determ_vertexes[vertex.name]['fst_labels_set'].union(fst_label_set)
+            determ_vertices[vertex.name]['is_determ'] = False
+    determ_vertices[vertex.name]['fst_labels_set'] = \
+        determ_vertices[vertex.name]['fst_labels_set'].union(fst_label_set)
+    if 'eps' in determ_vertices[vertex.name]['fst_labels_set'] and \
+            len(determ_vertices[vertex.name]['fst_labels_set']) > 1:
+        determ_vertices[vertex.name]['fst_labels_set'].remove('eps')
     return fst_label_set
 
 
@@ -79,15 +82,15 @@ def create_direct_dict(lgraph, cycle_iterations=1):
     if cycle_iterations < 1:
         print("Wrong cycle_iterations param value")
         raise ValueError
-    # many initial vertexes
-    determ_vertexes = dict()
+    # many initial vertices
+    determ_vertices = dict()
     for init_vert in lgraph.initials:
         vertex = list(init_vert.edges)[0].end
         trace_stack = {'round': [], 'square': []}
         passed_edges = dict()
         rest_direct(vertex, trace_stack, passed_edges, 
-                    determ_vertexes, lgraph.finals, cycle_iterations)
-    return determ_vertexes
+                    determ_vertices, lgraph.finals, cycle_iterations)
+    return determ_vertices
 
 
 def is_determinated(direct_dict):
