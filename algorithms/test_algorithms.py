@@ -1,5 +1,6 @@
 from lgraph import LGraph
 from algorithms import stack_processing, create_direct_dict, is_determinated
+from algorithms import create_conjugation_lgraph
 
 
 def test_stack_processing():
@@ -347,5 +348,98 @@ def test_is_determ():
     assert is_determinated(create_direct_dict(lg, 2)) == True
 
 
+def print_vertices(lg):
+    for vertex in lg.vertexes:
+        print(vertex.name)
+
+
+def print_edges(lg):
+    for edge in lg.edges:
+        print(edge.beg.name, edge.end.name, edge.label, 
+              edge.round_trace, edge.square_trace)
+
+
+def test_create_conjugation_lgraph():
+    lg1 = LGraph()
+    lg1.add_vertex('1')
+    lg1.add_vertex('2')
+    lg1.add_vertex('3')
+    lg1.add_edge(lg1.initial_main.name, '1')
+    lg1.add_edge('1', '2', label='a')
+    lg1.add_edge('2', '3', label='b')
+    lg1.add_edge('3', lg1.final_main.name)
+
+    lg2 = LGraph()
+    lg2.add_vertex('4')
+    lg2.add_vertex('5')
+    lg2.add_vertex('6')
+    lg2.add_edge(lg2.initial_main.name, '4')
+    lg2.add_edge('4', '5', label='a')
+    lg2.add_edge('5', '6', label='b')
+    lg2.add_edge('6', lg2.final_main.name)
+
+    conj_lgraph = create_conjugation_lgraph(lg1, lg2)
+    print('1:')
+    if conj_lgraph:
+        print_vertices(conj_lgraph)
+        print_edges(conj_lgraph)
+
+    lg1 = LGraph()
+    lg1.add_vertex('1')
+    lg1.add_vertex('2')
+    lg1.add_vertex('3')
+    lg1.add_vertex('initials_1')
+    lg1.add_edge(lg1.initial_main.name, '1')
+    lg1.add_edge('initials_1', '2')
+    lg1.add_edge('1', '3', label='a')
+    lg1.add_edge('2', '3', label='b')
+    lg1.add_edge('3', lg1.final_main.name)
+
+    lg2 = LGraph()
+    lg2.add_vertex('4')
+    lg2.add_vertex('5')
+    lg2.add_vertex('6')
+    lg2.add_vertex('initials_2')
+    lg2.add_edge(lg2.initial_main.name, '4')
+    lg2.add_edge('initials_2', '5')
+    lg2.add_edge('4', '6', label='a')
+    lg2.add_edge('5', '6', label='b')
+    lg2.add_edge('6', lg2.final_main.name)
+
+    conj_lgraph = create_conjugation_lgraph(lg1, lg2)
+    print('2:')
+    if conj_lgraph:
+        print_vertices(conj_lgraph)
+        print_edges(conj_lgraph)
+
+    lg1 = LGraph()
+    lg1.add_vertex('1')
+    lg1.add_vertex('2')
+    lg1.add_vertex('3')
+    lg1.add_vertex('initials_1')
+    lg1.add_edge(lg1.initial_main.name, '1')
+    lg1.add_edge('initials_1', '2')
+    lg1.add_edge('1', '3', label='a')
+    lg1.add_edge('2', '3', label='b')
+    lg1.add_edge('3', lg1.final_main.name)
+
+    lg2 = LGraph()
+    lg2.add_vertex('4')
+    lg2.add_vertex('5')
+    lg2.add_vertex('6')
+    lg2.add_vertex('initials_2')
+    lg2.add_edge(lg2.initial_main.name, '4')
+    lg2.add_edge('initials_2', '5')
+    lg2.add_edge('4', '6', label='a')
+    lg2.add_edge('5', '6', label='b')
+    lg2.add_edge('6', lg2.final_main.name)
+
+    conj_lgraph = create_conjugation_lgraph(lg1, lg2)
+    print('3:')
+    if conj_lgraph:
+        print_vertices(conj_lgraph)
+        print_edges(conj_lgraph)
+
+
 if __name__ == '__main__':
-    test_create_direct_dict()
+    test_create_conjugation_lgraph()
